@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de QR Code</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.2s;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        #qrcode {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        
+        .qr-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Générateur de QR Code</h1>
+        
+        <div class="info">
+            <strong>Votre lien:</strong><br>
+            https://forms.gle/ff653cm5TrubMYot5
+        </div>
+        
+        <div class="input-group">
+            <label for="urlInput">URL à encoder:</label>
+            <input type="url" id="urlInput" value="http://www.google.fr" placeholder="Entrez votre URL">
+        </div>
+        
+        <button onclick="generateQR()">Générer le QR Code</button>
+        <button onclick="downloadQR()" id="downloadBtn" style="display:none;">Télécharger PNG</button>
+        
+        <div id="qrcode"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        let currentQR = null;
+        
+        function generateQR() {
+            const url = document.getElementById('urlInput').value;
+            const qrcodeDiv = document.getElementById('qrcode');
+            
+            if (!url) {
+                alert('Veuillez entrer une URL valide');
+                return;
+            }
+            
+            // Clear previous QR code
+            qrcodeDiv.innerHTML = '';
+            
+            // Create canvas element
+            const canvas = document.createElement('canvas');
+            
+            // Create QR code
+            currentQR = new QRious({
+                element: canvas,
+                value: url,
+                size: 256,
+                background: '#ffffff',
+                foreground: '#000000',
+                level: 'M'
+            });
+            
+            // Create container and add canvas
+            const container = document.createElement('div');
+            container.className = 'qr-container';
+            container.appendChild(canvas);
+            qrcodeDiv.appendChild(container);
+            
+            // Show download button
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+        }
+        
+        function downloadQR() {
+            if (!currentQR) {
+                alert('Veuillez d\'abord générer un QR code');
+                return;
+            }
+            
+            const canvas = currentQR.element;
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Generate QR code automatically on page load
+        window.onload = function() {
+            generateQR();
+        };
+        
+        // Allow Enter key to generate QR code
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+    </script>
+</body>
+</html>
